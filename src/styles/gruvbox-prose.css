@@ -91,6 +91,8 @@ article {
     @apply bg-gruvbox-bg2 text-gruvbox-fg0;
     font-size: 1em;
     padding: 0.125rem 0.25rem;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
 
   /* Links - override colors */
