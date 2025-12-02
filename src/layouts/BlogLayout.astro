@@ -1,0 +1,51 @@
+---
+import Layout from './Layout.astro';
+import '../styles/gruvbox-prose.css';
+
+type Props = {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<Layout title={title}>
+  <div class="min-h-screen bg-gruvbox-bg0 p-8">
+    <div class="max-w-3xl mx-auto">
+      <div class="mb-8">
+        <a href="/" class="text-gruvbox-fg2 hover:text-gruvbox-yellow transition-colors font-mono text-lg">
+          ← back
+        </a>
+      </div>
+
+      <article class="typewriter-content">
+        <div class="typewriter-title">
+          <h1>{title}</h1>
+        </div>
+
+        {description && (
+          <p class="typewriter-intro">{description}</p>
+        )}
+
+        <div class="prose prose-lg max-w-none typewriter-prose">
+          <slot />
+        </div>
+      </article>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .typewriter-content {
+    @apply font-mono space-y-8;
+  }
+
+  .typewriter-title h1 {
+    @apply text-4xl font-bold text-gruvbox-fg0 mb-1 tracking-wide;
+  }
+
+  .typewriter-intro {
+    @apply text-gruvbox-fg0 text-lg leading-relaxed tracking-wide;
+  }
+</style>
