@@ -1,6 +1,6 @@
 ---
 title: "Reverse Engineering Signin with Claude from Claude Code"
-description: "A deep dive into Claude's OAuth implementation and how to integrate 'Sign in with Claude' into your applications"
+description: "A deep dive into Claude's OAuth implementation and how to integrate 'Sign in with Claude' into your applications."
 date: 2025-12-02
 tags: ["oauth", "claude", "authentication", "reverse-engineering"]
 ---
@@ -10,22 +10,26 @@ Imagine a world where you can just connect your claude account to any app you're
 this will enable a lot of small companies / makers to make ai apps without worrying about the cost,
 
 1. They can save the user from the painful UX of creating api keys and giving it to the app
-2. You don't to choose b/w inference costs and a good UX, you can have your cake and eat it. User's get a familiar signin flow, you get to not have the burden of inference costs. (ps: not recommended for people trying to sell sonnet for 50 cents on a dollar and claim bazillion USD ARR. )
+2. They don't have to choose b/w inference costs and a good UX, User's get a familiar signin flow, you get to not have the burden of inference costs. (ps: not recommended for people trying to sell sonnet for 50 cents on a dollar and claim bazillion USD ARR. )
 
 ok, all fun and games, but signin with claude does not exist ? right ?
 
-wrong, it does exists, and the answer is in claude code and how it implements the login with your pro/max account, and lucky for you, my dear brother in claude, i've done the work, and i will give you all the details on how to get it working, so you can use sign in with claude in your apps.
+wrong, it does exist, claude code's sign in experience is powered by it, you just have to figure out the implementation details. lucky for you, i've done the work, and i will give you all the details on how to get it working, so you can use sign in with claude in your apps.
 
 There's no rocket science, the flow is the usual Auth Code + PKCE Oauth flow that most apps use these days, with a bit of a twist, Here are the params that you need to know.
 
-```json
+```jsonc
 {
   "authorization_endpoint": "https://claude.ai/oauth/authorize",
   "token_endpoint": "https://console.anthropic.com/v1/oauth/token",
+  // this is the client id of claude code
   "client_id": "9d1c250a-e61b-44d9-88ed-5944d1962f5e",
-  "redirect_uri": "https://console.anthropic.com/oauth/code/callback",
+  // see "Callback Options" below for localhost vs hosted redirect
+  "redirect_uri": "http://localhost:{PORT}/callback" | "https://console.anthropic.com/oauth/code/callback",
   "response_type": "code",
   "code_challenge_method": "S256",
+  // only request what you need (Principle of Least Privilege)
+  // e.g., we're not requesting "org:create_api_key" or "user:sessions:claude_code" here
   "scopes": ["user:profile", "user:inference"]
 }
 ```
@@ -95,8 +99,6 @@ Now let's get back to our example. Copy and paste the below URL into your browse
 
 > **Note:** Don't worry—this URL is safe. It points to `claude.ai` and redirects to `console.anthropic.com`. Everything stays within Claude's ecosystem.
 
-> **Important:** This is a complete working example with pre-generated values. The `state`, `code_challenge`, and `code_verifier` (shown later) work together as a set. For your own implementation, you MUST generate fresh random values for each authorization flow.
-
 ```
 https://claude.ai/oauth/authorize?code=true&client_id=9d1c250a-e61b-44d9-88ed-5944d1962f5e&response_type=code&redirect_uri=https%3A%2F%2Fconsole.anthropic.com%2Foauth%2Fcode%2Fcallback&scope=user%3Aprofile+user%3Ainference&code_challenge=tVMQFcwjTUOtHRtenoyryOFO7RNuvZcrckwonpFEHMA&code_challenge_method=S256&state=FnYjhTFqgrmuvpM7c1voDJzGlurOUsDGRc58hk3YHbg
 ```
@@ -159,13 +161,6 @@ When the server receives your token exchange request, it:
 1. Validates that `state` matches the state from the authorization request
 2. Calculates `sha256(code_verifier)` and verifies it matches the `code_challenge` from authorization
 3. Only then issues tokens
-
-> **Important Security Note:**
->
-> - Generate TWO separate random values: one for `state`, one for `code_verifier`
-> - Both should be cryptographically random: `crypto.randomBytes(32).toString('base64url')`
-> - Never reuse values across different authorization flows
-> - The example values in this doc are for demonstration - they ONLY work together as a set
 
 ### Successful Token Response
 
@@ -250,8 +245,6 @@ curl -X POST "https://api.anthropic.com/v1/messages" \
     "messages": [{"role": "user", "content": "Hello"}]
   }'
 ```
-
-**Note:** The system message can also be added in the messages array if preferred.
 
 **TypeScript SDK example:**
 
