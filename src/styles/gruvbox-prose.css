@@ -1,0 +1,138 @@
+/* Gruvbox Typewriter Prose Styles */
+/* Layers on top of Tailwind prose for colors/fonts, keeps prose spacing */
+
+article {
+  counter-reset: section;
+}
+
+.typewriter-prose {
+  @apply text-gruvbox-fg1 tracking-wide;
+
+  /* Headings - override colors, increase spacing */
+  & h2 {
+    @apply text-gruvbox-yellow font-bold;
+    counter-increment: section;
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+  }
+
+  & h2::before {
+    content: counter(section, upper-roman) ". ";
+  }
+
+  & h3 {
+    @apply text-gruvbox-yellow;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  & h4 {
+    @apply text-gruvbox-fg0;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Lists - override colors/markers, keep prose spacing */
+  & li {
+    @apply text-gruvbox-fg1;
+  }
+
+  /* Unordered list bullets */
+  & ul > li {
+    @apply list-none relative;
+  }
+
+  & ul > li::before {
+    content: "•";
+    @apply absolute text-gruvbox-orange;
+    left: -1.5em;
+  }
+
+  /* Ordered list numbers */
+  & ol {
+    counter-reset: list-counter;
+    @apply list-none;
+  }
+
+  & ol > li {
+    counter-increment: list-counter;
+    @apply relative;
+  }
+
+  & ol > li::before {
+    content: counter(list-counter) ")";
+    @apply absolute text-gruvbox-green font-bold;
+    left: -2em;
+  }
+
+  /* Code Blocks - override colors, keep prose spacing */
+  & pre {
+    @apply bg-gruvbox-bg0 border-l-4 border-gruvbox-gold relative;
+    /* Make scrollable with no wrapping */
+    overflow-x: auto;
+    white-space: pre;
+    max-width: 100%;
+  }
+
+  & pre code {
+    /* Ensure code inside pre doesn't wrap */
+    white-space: pre;
+    display: block;
+  }
+
+  & pre::before {
+    content: "→ " attr(data-language);
+    @apply block text-gruvbox-fg2 text-xs mb-3 tracking-wider uppercase;
+    white-space: normal;
+  }
+
+  /* Inline Code - override colors, match text size */
+  & :not(pre) > code {
+    @apply bg-gruvbox-bg2 text-gruvbox-fg0;
+    font-size: 1em;
+    padding: 0.125rem 0.25rem;
+  }
+
+  /* Links - override colors */
+  & a {
+    @apply text-gruvbox-yellow decoration-gruvbox-bg3 hover:decoration-gruvbox-yellow;
+  }
+
+  /* Blockquotes - override colors */
+  & blockquote {
+    @apply border-gruvbox-gold text-gruvbox-fg1;
+  }
+
+  /* Strong/Bold - same color as text, just bold weight */
+  & strong {
+    @apply text-gruvbox-fg0 font-semibold;
+  }
+
+  /* Emphasis/Italic - override colors */
+  & em {
+    @apply text-gruvbox-fg0;
+  }
+
+  /* Tables - override colors */
+  & th {
+    @apply bg-gruvbox-bg2 text-gruvbox-yellow border-gruvbox-bg3;
+  }
+
+  & td {
+    @apply border-gruvbox-bg3 text-gruvbox-fg1;
+  }
+
+  & tr:hover {
+    @apply bg-gruvbox-bg2/50;
+  }
+
+  /* Horizontal Rule - override colors */
+  & hr {
+    @apply border-gruvbox-bg3;
+  }
+
+  /* Images - add shadow */
+  & img {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+}
