@@ -10,7 +10,7 @@ Imagine a world where you can just connect your claude account to any app you're
 this will enable a lot of small companies / makers to make ai apps without worrying about the cost,
 
 1. They can save the user from the painful UX of creating api keys and giving it to the app
-2. They don't have to choose b/w inference costs and a good UX, User's get a familiar signin flow, you get to not have the burden of inference costs. (ps: not recommended for people trying to sell sonnet for 50 cents on a dollar and claim bazillion USD ARR. )
+2. They don't have to choose b/w inference costs and a good UX, User's get a familiar signin flow, they get to not have the burden of inference costs. (ps: not recommended for people trying to sell sonnet for 50 cents on a dollar and claim bazillion USD ARR. )
 
 ok, all fun and games, but signin with claude does not exist ? right ?
 
@@ -40,9 +40,11 @@ Ok, but what are all these values ? Hmm, A full blown oauth flows tutorial is ou
 
 **What OAuth enables:** OAuth Let users grant your app access to their account (e.g., Claude) without sharing their password. User authenticates directly with Claude → your app gets tokens → you call APIs on their behalf.
 
-OAuth has multiple flows. **Authorization Code** is the most secure—it retrieves access tokens (and optionally refresh tokens) without exposing them in the browser URL.
+OAuth has multiple flows. **Authorization Code** is the most secure, it retrieves access tokens (and optionally refresh tokens) without exposing them in the browser URL.
 
-Traditional auth code flow uses `client_id` + `client_secret`. But we don't have a client_secret here. That's because Claude Code is a "public client" (CLI tools, mobile apps, SPAs can't securely store secrets). Instead, we use **PKCE** (next section) to replace the client_secret.
+Traditional auth code flow uses `client_id` + `client_secret`. But we don't have a client_secret here. That's because Claude Code is a "public client" (CLI tools, mobile apps, SPAs can't securely store secrets). Without a client_secret, anyone who intercepts the authorization code could exchange it for tokens. **PKCE** (next section) prevents this by binding the token request to the original authorization request.
+
+Now let's look at the parameters and what they do,
 
 **Core parameters:**
 
@@ -64,7 +66,7 @@ Traditional auth code flow uses `client_id` + `client_secret`. But we don't have
 - `code_challenge` — SHA256 hash of the verifier, sent in auth URL
 - `code_challenge_method=S256` — tells server you used SHA256
 
-**Attack vectors mitigated:**
+**Because we have PKCE, we shield ourselves from these attack vectors:**
 
 - **Authorization Code Interception** — attacker grabs code from callback URL (via malicious app, logs, browser history)
 - **Code Injection** — attacker injects a stolen code into a legitimate client
@@ -97,7 +99,7 @@ With PKCE, code is useless without the original `code_verifier` (only your app h
 
 Now let's get back to our example. Copy and paste the below URL into your browser:
 
-> **Note:** Don't worry—this URL is safe. It points to `claude.ai` and redirects to `console.anthropic.com`. Everything stays within Claude's ecosystem.
+This URL is safe. It points to `claude.ai` and redirects to `console.anthropic.com`. Everything stays within Claude's ecosystem.
 
 ```
 https://claude.ai/oauth/authorize?code=true&client_id=9d1c250a-e61b-44d9-88ed-5944d1962f5e&response_type=code&redirect_uri=https%3A%2F%2Fconsole.anthropic.com%2Foauth%2Fcode%2Fcallback&scope=user%3Aprofile+user%3Ainference&code_challenge=tVMQFcwjTUOtHRtenoyryOFO7RNuvZcrckwonpFEHMA&code_challenge_method=S256&state=FnYjhTFqgrmuvpM7c1voDJzGlurOUsDGRc58hk3YHbg

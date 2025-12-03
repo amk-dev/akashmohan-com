@@ -65,13 +65,35 @@ article {
     left: -2em;
   }
 
+  /* Code Block Wrapper - needed for fixed copy button position */
+  & .code-block-wrapper {
+    @apply relative;
+  }
+
   /* Code Blocks - override colors, keep prose spacing */
   & pre {
-    @apply bg-gruvbox-bg0 border-l-4 border-gruvbox-gold relative;
+    @apply bg-gruvbox-bg0 border-l-4 border-gruvbox-gold;
     /* Make scrollable with no wrapping */
     overflow-x: auto;
     white-space: pre;
     max-width: 100%;
+  }
+
+  /* Copy Button - positioned relative to wrapper, not pre */
+  & .code-block-wrapper .copy-button {
+    @apply absolute top-2 right-2 px-2 py-1 text-xs font-mono;
+    @apply bg-gruvbox-bg2 text-gruvbox-fg2 rounded;
+    @apply hover:bg-gruvbox-bg3 hover:text-gruvbox-fg0;
+    @apply transition-all duration-200 cursor-pointer;
+    @apply opacity-0;
+  }
+
+  & .code-block-wrapper:hover .copy-button {
+    @apply opacity-100;
+  }
+
+  & .code-block-wrapper .copy-button.copied {
+    @apply text-gruvbox-green;
   }
 
   & pre code {
